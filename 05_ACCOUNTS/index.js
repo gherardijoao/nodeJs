@@ -1,10 +1,8 @@
 // modulos externos
-
 const inquirer = require("inquirer");
 const chalk = require("chalk");
 
-//modulos internos
-
+// modulos internos
 const fs = require("fs");
 
 function operation() {
@@ -27,16 +25,61 @@ function operation() {
       const action = answer["action"];
       if (action === "criar conta") {
         createAccount();
+      } else if (action === "depositar") {
+      } else if (action === "consultar saldo") {
+      } else if (action === "sacar") {
+      } else if (action === "sair") {
+        console.log(chalk.bgBlue.black("obrigado por usar o accounts!"));
+        process.exit();
       }
     })
     .catch((err) => console.log(err));
 }
 
 //create account
-
 function createAccount() {
   console.log(chalk.bgGreen.black("Parabéns por escolher o nosso banco!"));
   console.log(chalk.green("Defina as opções da sua conta a seguir"));
+  buildAccount(); // chamada adicionada
+}
+
+function buildAccount() {
+  inquirer
+    .prompt([
+      {
+        name: "accountName", // corrigido
+        message: "Digite um nome para a sua conta:",
+      },
+    ])
+    .then((answer) => {
+      const accountName = answer["accountName"]; // corrigido
+
+      console.info(accountName);
+
+      if (!fs.existsSync("accounts")) {
+        fs.mkdirSync("accounts");
+      }
+
+      if (fs.existsSync(`accounts/${accountName}.json`)) {
+        console.log(
+          chalk.bgRed.black("Esta conta já existe, escolha outro nome!")
+        );
+        buildAccount();
+        return;
+      }
+
+      fs.writeFileSync(
+        `accounts/${accountName}.json`,
+        '{"balance": 0',
+        function (err) {
+          console.log(err);
+        }
+      );
+
+      console.log(chalk.green("Parabéns, a sua conta foi criada"));
+      operation();
+    })
+    .catch((err) => console.log(err));
 }
 
 operation();
